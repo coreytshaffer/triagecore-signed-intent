@@ -1,0 +1,16 @@
+{
+  "approver_identity_id": "human-corey",
+  "artifact_byte_digest": "sha256:6af8a1a0eb28f3d2f36079da04d42a44681a8a6d6e72a12b9a8de4311a3c0fca",
+  "decision_id": "yk58-release-78822deda7f65595",
+  "expires_at": "2026-08-06T15:00:00+00:00",
+  "issued_at": "2026-08-06T04:42:59.379231+00:00",
+  "nonce": "8a1f0176-9677-446d-a3f2-e0a8acd6678c",
+  "plan_body_digest": "sha256:2c9122a17a7633dd67bec26c44545322cf633171c7b4d49f88b8c6b0dec1ec3e",
+  "policy_version": "signed-intent-release-v1",
+  "risk_class": "medium",
+  "rp_id": "triagecore.local",
+  "schema": "triagecore.authz.request.v2",
+  "scope_digest": "sha256:f83dd628d3eab461f5bfeb61f4b09fde7c91b4a862f3556b13d3306ba1a7b742",
+  "task_id": "f3c24d60-5360-41dc-9dc6-b7cbb91b68b8",
+  "user_verification_required": false
+}

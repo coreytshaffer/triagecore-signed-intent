@@ -1,0 +1,64 @@
+{
+  "schema": "triagecore.preview-sign-authorization-evidence.v1",
+  "request": {
+    "approver_identity_id": "human-corey",
+    "artifact_byte_digest": "sha256:6af8a1a0eb28f3d2f36079da04d42a44681a8a6d6e72a12b9a8de4311a3c0fca",
+    "decision_id": "yk58-release-78822deda7f65595",
+    "expires_at": "2026-08-06T15:00:00+00:00",
+    "issued_at": "2026-08-06T04:42:59.379231+00:00",
+    "nonce": "8a1f0176-9677-446d-a3f2-e0a8acd6678c",
+    "plan_body_digest": "sha256:2c9122a17a7633dd67bec26c44545322cf633171c7b4d49f88b8c6b0dec1ec3e",
+    "policy_version": "signed-intent-release-v1",
+    "risk_class": "medium",
+    "rp_id": "triagecore.local",
+    "schema": "triagecore.authz.request.v2",
+    "scope_digest": "sha256:f83dd628d3eab461f5bfeb61f4b09fde7c91b4a862f3556b13d3306ba1a7b742",
+    "task_id": "f3c24d60-5360-41dc-9dc6-b7cbb91b68b8",
+    "user_verification_required": false
+  },
+  "request_digest": "sha256:694753fb27e58d17db06878528775406a3e99320860526a64f0cce1f7ecba620",
+  "signing": {
+    "feature": "YubiKey 5.8 previewSign with ARKG-P256",
+    "algorithm": "ARKG-P256 / ESP256 (-9) / SHA-256",
+    "context": "triagecore-signed-intent/v1",
+    "ikm_b64url": "cH2mMrctVYXl_o4lzf7bTI46X-WO0LS0tYvPd-f_-Rw",
+    "master_public_key_cose_b64url": "pQE6AAEAAAM6AAEAoyClAQIDJiABIVggluKM84C07okLUFTGxP-zc1lXiBZnUAJsRZ7khm_LcLIiWCAFLZHV-zWpd2M-_oRokLOYXjfZBBPN_BsPoxNW-uuyPyGlAQIDOBggASFYIB7N6zmk3-HstuQVcF8leAAY1_a_9Wt9pBGUxqV57G78IlggIpcIi5eucS-ubJafydkldANwfWL2YqXON-Xz8SqG1qQiKA",
+    "derived_public_key_cose_b64url": "pQECAyggASFYIFIimjXQyE5y40nERMzWTdwM15LSHuqLafVH4EJIQXYRIlggyyzzSeMF9FgsB3oWm5-rcEXr1RxOZXVNiux7L8VHB4c",
+    "signature_b64url": "MEUCIBzsK_oE-8nz2BS8epibZiyROTPrl8vv7GaLSpG-xWpRAiEApeKLvcubDLBTn8f0txA-Ifqp9R8xdIyTGw8VncGmgfo",
+    "attestation": "none",
+    "user_verification_required": false
+  },
+  "limitations": [
+    "YubiKey 5.8 previewSign and its tooling are beta/preview interfaces.",
+    "This evidence does not establish device attestation or a YubiKey model identity.",
+    "A hardware touch demonstrates credential interaction, not comprehension or informed consent.",
+    "This experiment is not connected to tc run or downstream action execution.",
+    "One-use capability claiming remains a separate established TriageCore mechanism."
+  ],
+  "review": {
+    "intent": {
+      "action": "publish_hackathon_submission",
+      "repository": "coreytshaffer/triagecore-signed-intent",
+      "ref": "78822deda7f65595cbe56b552e9ae20965a3c122",
+      "purpose": "YubiKey 5.8 Hackathon submission",
+      "requested_by": "agent:submission-prep",
+      "authorized_operation": "publish the referenced source and evidence"
+    },
+    "scope": {
+      "allowed_effects": [
+        "publish the referenced public source repository",
+        "publish the referenced public verification evidence"
+      ],
+      "prohibited_effects": [
+        "execute an agent action",
+        "modify other repositories",
+        "use network access beyond repository publication",
+        "reuse this authorization after expiration"
+      ]
+    },
+    "release_ref": {
+      "repository": "coreytshaffer/triagecore-signed-intent",
+      "ref": "78822deda7f65595cbe56b552e9ae20965a3c122"
+    }
+  }
+}

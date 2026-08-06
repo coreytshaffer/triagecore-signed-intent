@@ -1,0 +1,31 @@
+TriageCore Signed Intent release verification
+=============================================
+
+Reviewed release candidate:
+  78822deda7f65595cbe56b552e9ae20965a3c122
+
+Frozen authorization request digest:
+  sha256:694753fb27e58d17db06878528775406a3e99320860526a64f0cce1f7ecba620
+
+YubiKey 5.8 previewSign ceremony:
+  [OK] Two physical interaction prompts completed.
+  [OK] YubiKey 5.8 previewSign signature verified offline.
+  [OK] Request digest matched the frozen authorization request.
+
+Independent offline verification:
+  [OK] Offline signature verified.
+  [OK] Request digest matched.
+  [OK] Authorization unexpired through 2026-08-06T15:00:00+00:00.
+
+Negative test:
+  [OK] A tampered decision_id was rejected: canonical request digest mismatch.
+  [OK] No authorization accepted.
+
+Test and lint checks:
+  [OK] Fresh isolated release package: 2 passed.
+  [OK] ruff check . completed without findings for the release package.
+
+Boundary:
+  This verifies portable evidence over a bounded release authorization. It does
+  not attest to device model, prove human comprehension, or enforce downstream
+  agent execution.

@@ -1,0 +1,26 @@
+{
+  "intent": {
+    "action": "publish_hackathon_submission",
+    "repository": "coreytshaffer/triagecore-signed-intent",
+    "ref": "78822deda7f65595cbe56b552e9ae20965a3c122",
+    "purpose": "YubiKey 5.8 Hackathon submission",
+    "requested_by": "agent:submission-prep",
+    "authorized_operation": "publish the referenced source and evidence"
+  },
+  "scope": {
+    "allowed_effects": [
+      "publish the referenced public source repository",
+      "publish the referenced public verification evidence"
+    ],
+    "prohibited_effects": [
+      "execute an agent action",
+      "modify other repositories",
+      "use network access beyond repository publication",
+      "reuse this authorization after expiration"
+    ]
+  },
+  "release_ref": {
+    "repository": "coreytshaffer/triagecore-signed-intent",
+    "ref": "78822deda7f65595cbe56b552e9ae20965a3c122"
+  }
+}
