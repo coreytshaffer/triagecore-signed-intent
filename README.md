@@ -52,6 +52,17 @@ extension data.
 .\.venv\Scripts\python.exe verify_authorization.py --tamper decision_id
 ```
 
+After the authorization expires, verify its archived cryptographic evidence:
+
+```powershell
+.\.venv\Scripts\python.exe verify_authorization.py --allow-expired
+```
+
+Normal verification enforces the signature, canonical digest, structure, and
+expiration policy. Archival verification still enforces the signature, digest,
+and structure, but explicitly does not treat the authorization as currently
+actionable.
+
 The signing script displays the frozen human-readable intent before requesting
 the two physical interactions used by the ARKG setup and signing ceremony.
 
