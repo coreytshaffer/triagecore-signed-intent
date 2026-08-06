@@ -1,0 +1,8 @@
+{
+  "action": "publish_hackathon_submission",
+  "repository": "REPLACED_BY_PREPARE_SCRIPT",
+  "ref": "REPLACED_BY_PREPARE_SCRIPT",
+  "purpose": "YubiKey 5.8 Hackathon submission",
+  "requested_by": "agent:submission-prep",
+  "authorized_operation": "publish the referenced source and evidence"
+}
