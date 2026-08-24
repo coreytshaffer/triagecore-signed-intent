@@ -19,6 +19,15 @@ human-readable release intent
         -> portable evidence and offline verification
 ```
 
+### Evidence boundary
+
+![TriageCore Signed Intent flowchart separating demonstrated authorization evidence from future downstream integration](docs/signed-intent-flowchart.svg)
+
+> **Prior-work evidence: TriageCore Signed Intent.** A human-reviewed request is
+> canonically bound to scope and an exact commit, hardware-signed, packaged, and
+> verified offline. Executor enforcement, execution evidence, and independent
+> validation remain separate downstream concerns.
+
 The release intent binds publication to the exact reviewed Git commit, not a
 mutable branch name.
 
