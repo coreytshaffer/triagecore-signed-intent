@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">TriageCore Signed Intent authorization evidence flowchart</title>
+  <desc id="desc">A grayscale flowchart separates the repository's demonstrated authorization-evidence workflow from future downstream execution and independent validation that are not implemented here.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#202020"/>
+    </marker>
+    <style>
+      .title { font: 700 52px Inter, "Segoe UI", Arial, sans-serif; fill: #111; }
+      .subtitle { font: 400 27px Inter, "Segoe UI", Arial, sans-serif; fill: #555; }
+      .region-label { font: 700 25px Inter, "Segoe UI", Arial, sans-serif; fill: #111; letter-spacing: .3px; }
+      .node-title { font: 700 22px Inter, "Segoe UI", Arial, sans-serif; fill: #111; }
+      .compact-title { font: 700 18px Inter, "Segoe UI", Arial, sans-serif; fill: #111; }
+      .decision-title { font: 700 18px Inter, "Segoe UI", Arial, sans-serif; fill: #111; }
+      .body { font: 400 19px Inter, "Segoe UI", Arial, sans-serif; fill: #222; }
+      .small { font: 400 17px Inter, "Segoe UI", Arial, sans-serif; fill: #222; }
+      .result { font: 700 21px Inter, "Segoe UI", Arial, sans-serif; fill: #111; }
+      .branch { font: 700 16px Inter, "Segoe UI", Arial, sans-serif; fill: #222; }
+      .boundary { font: 600 17px Inter, "Segoe UI", Arial, sans-serif; fill: #222; }
+      .solid { fill: #fff; stroke: #202020; stroke-width: 2.5; }
+      .soft { fill: #f3f3f3; stroke: #505050; stroke-width: 2; }
+      .future { fill: #f7f7f7; stroke: #555; stroke-width: 2.5; stroke-dasharray: 12 9; }
+      .flow { fill: none; stroke: #202020; stroke-width: 3; marker-end: url(#arrow); }
+      .future-flow { fill: none; stroke: #505050; stroke-width: 3; stroke-dasharray: 10 8; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#fff"/>
+  <text class="title" x="800" y="64" text-anchor="middle">TriageCore Signed Intent</text>
+  <text class="subtitle" x="800" y="104" text-anchor="middle">Authorization evidence, not execution proof</text>
+
+  <rect class="solid" x="30" y="135" width="1540" height="445" rx="12"/>
+  <text class="region-label" x="64" y="176">CURRENT REPOSITORY — DEMONSTRATED</text>
+
+  <rect class="solid" x="58" y="220" width="195" height="215" rx="10"/>
+  <text class="node-title" x="155" y="257" text-anchor="middle">1. PROPOSE</text>
+  <text class="body" x="155" y="305" text-anchor="middle">
+    <tspan x="155">Agent drafts a</tspan>
+    <tspan x="155" dy="28">bounded request</tspan>
+  </text>
+  <rect class="soft" x="82" y="365" width="147" height="48" rx="7"/>
+  <text class="body" x="155" y="396" text-anchor="middle">No authority</text>
+
+  <path class="flow" d="M 253 327 L 288 327"/>
+  <rect class="solid" x="290" y="220" width="205" height="215" rx="10"/>
+  <text class="node-title" x="392" y="257" text-anchor="middle">2. REVIEW</text>
+  <text class="body" x="392" y="301" text-anchor="middle">
+    <tspan x="392">Human reviews</tspan>
+    <tspan x="392" dy="27">effects, policy,</tspan>
+    <tspan x="392" dy="27">expiry, and</tspan>
+    <tspan x="392" dy="27">Git commit</tspan>
+  </text>
+
+  <path class="flow" d="M 495 327 L 530 327"/>
+  <rect class="solid" x="532" y="220" width="255" height="215" rx="10"/>
+  <text class="compact-title" x="659" y="257" text-anchor="middle">3. CANONICALIZE + SIGN</text>
+  <text class="body" x="659" y="307" text-anchor="middle">SHA-256 digest</text>
+  <text class="body" x="659" y="348" text-anchor="middle">YubiKey P-256 signature</text>
+  <text class="small" x="659" y="397" text-anchor="middle">Private key stays on device</text>
+
+  <path class="flow" d="M 787 327 L 822 327"/>
+  <rect class="solid" x="824" y="220" width="218" height="215" rx="10"/>
+  <text class="node-title" x="933" y="257" text-anchor="middle">4. PACKAGE</text>
+  <text class="body" x="859" y="302">• Request</text>
+  <text class="body" x="859" y="337">• Review material</text>
+  <text class="body" x="859" y="372">• Public key reference</text>
+  <text class="body" x="859" y="407">• Signature</text>
+
+  <path class="flow" d="M 1042 327 L 1070 327"/>
+  <polygon class="solid" points="1182,203 1300,327 1182,451 1064,327"/>
+  <text class="decision-title" x="1182" y="244" text-anchor="middle">
+    <tspan x="1182">OFFLINE</tspan>
+    <tspan x="1182" dy="22">VERIFICATION</tspan>
+    <tspan x="1182" dy="22">PASSES?</tspan>
+  </text>
+  <text class="small" x="1135" y="333">□ Signature</text>
+  <text class="small" x="1135" y="359">□ Commit</text>
+  <text class="small" x="1135" y="385">□ Scope</text>
+  <text class="small" x="1135" y="411">□ Expiry</text>
+  <text class="small" x="1135" y="437">□ Tampering</text>
+
+  <text class="branch" x="1310" y="305">YES</text>
+  <path class="flow" d="M 1300 327 L 1350 327"/>
+  <rect class="solid" x="1352" y="248" width="190" height="158" rx="10"/>
+  <text class="result" x="1447" y="298" text-anchor="middle">
+    <tspan x="1447">AUTHORIZATION</tspan>
+    <tspan x="1447" dy="29">EVIDENCE</tspan>
+    <tspan x="1447" dy="29">VERIFIED</tspan>
+  </text>
+
+  <text class="branch" x="1200" y="474">NO</text>
+  <path class="flow" d="M 1182 451 L 1182 489"/>
+  <rect class="soft" x="1072" y="491" width="220" height="64" rx="9"/>
+  <text class="result" x="1182" y="517" text-anchor="middle">
+    <tspan x="1182">REJECT /</tspan>
+    <tspan x="1182" dy="25">FAIL CLOSED</tspan>
+  </text>
+
+  <path class="future-flow" d="M 1447 406 L 1447 620 L 1360 620"/>
+  <rect class="future" x="735" y="610" width="835" height="165" rx="13"/>
+  <text class="region-label" x="1152" y="645" text-anchor="middle">FUTURE DOWNSTREAM INTEGRATION — NOT IMPLEMENTED HERE</text>
+  <rect class="future" x="770" y="674" width="215" height="70" rx="10"/>
+  <text class="body" x="877" y="702" text-anchor="middle">
+    <tspan x="877">Executor checks</tspan>
+    <tspan x="877" dy="25">authorization</tspan>
+  </text>
+  <path class="future-flow" d="M 985 709 L 1035 709"/>
+  <rect class="future" x="1037" y="674" width="200" height="70" rx="10"/>
+  <text class="body" x="1137" y="702" text-anchor="middle">
+    <tspan x="1137">Execution</tspan>
+    <tspan x="1137" dy="25">evidence</tspan>
+  </text>
+  <path class="future-flow" d="M 1237 709 L 1287 709"/>
+  <rect class="future" x="1289" y="674" width="245" height="70" rx="10"/>
+  <text class="body" x="1411" y="702" text-anchor="middle">
+    <tspan x="1411">Independent</tspan>
+    <tspan x="1411" dy="25">validation</tspan>
+  </text>
+
+  <rect class="soft" x="30" y="805" width="355" height="65" rx="9"/>
+  <text class="boundary" x="207" y="832" text-anchor="middle">
+    <tspan x="207">Authorization evidence ≠</tspan>
+    <tspan x="207" dy="24">Execution evidence ≠ Validation</tspan>
+  </text>
+  <rect class="soft" x="405" y="805" width="370" height="65" rx="9"/>
+  <text class="boundary" x="590" y="832" text-anchor="middle">
+    <tspan x="590">Hardware interaction does not</tspan>
+    <tspan x="590" dy="24">prove comprehension</tspan>
+  </text>
+  <rect class="soft" x="795" y="805" width="370" height="65" rx="9"/>
+  <text class="boundary" x="980" y="832" text-anchor="middle">
+    <tspan x="980">Signing does not prove</tspan>
+    <tspan x="980" dy="24">execution or outcome</tspan>
+  </text>
+  <rect class="soft" x="1185" y="805" width="385" height="65" rx="9"/>
+  <text class="boundary" x="1377" y="832" text-anchor="middle">
+    <tspan x="1377">Changing intent requires</tspan>
+    <tspan x="1377" dy="24">re-signing</tspan>
+  </text>
+</svg>
