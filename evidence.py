@@ -206,9 +206,11 @@ def verify_evidence(
         raise EvidenceVerificationError("derived key does not match ARKG context and IKM")
 
     verify_signature(request.canonical_bytes(), derived, signature)
+    release_ref = review["release_ref"]
     return {
         "request_digest": digest,
         "expires_at": request.expires_at,
+        "release_target": f"{release_ref['repository']}@{release_ref['ref']}",
         "status": "verified",
     }
 

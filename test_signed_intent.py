@@ -260,3 +260,22 @@ def test_building_evidence_requires_a_release_review():
             ikm=bytes(32),
             signature=b"",
         )
+
+
+SAMPLE_RELEASE_TARGET = "coreytshaffer/triagecore-signed-intent@78822deda7f65595cbe56b552e9ae20965a3c122"
+
+
+def test_verification_reports_the_bound_release_target():
+    summary = verify_evidence(load_sample_evidence(), enforce_expiration=False)
+    assert summary["release_target"] == SAMPLE_RELEASE_TARGET
+
+
+def test_verifier_prints_the_bound_release_target():
+    result = subprocess.run(
+        [sys.executable, str(DIRECTORY / "verify_authorization.py"), "--allow-expired"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout
+    assert f"[OK] Release target bound: {SAMPLE_RELEASE_TARGET}" in result.stdout

@@ -72,6 +72,7 @@ def main() -> int:
         return 1
     print("[OK] Offline signature verified")
     print(f"[OK] Request digest matched: {summary['request_digest']}")
+    print(f"[OK] Release target bound: {summary['release_target']}")
     if args.allow_expired:
         print("[WARN] Expiration policy was not enforced (archival verification mode)")
     else:
