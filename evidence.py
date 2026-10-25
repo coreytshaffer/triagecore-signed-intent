@@ -126,7 +126,7 @@ def build_evidence(
     derived_public_key: CoseKey,
     ikm: bytes,
     signature: bytes,
-    review: Mapping[str, Any] | None = None,
+    review: Mapping[str, Any],
 ) -> dict[str, Any]:
     evidence = {
         "schema": EVIDENCE_SCHEMA,
@@ -145,9 +145,8 @@ def build_evidence(
         },
         "limitations": list(LIMITATIONS),
     }
-    if review is not None:
-        validate_review_binding(request, review)
-        evidence["review"] = dict(review)
+    validate_review_binding(request, review)
+    evidence["review"] = dict(review)
     return evidence
 
 
@@ -181,11 +180,13 @@ def verify_evidence(
         raise EvidenceVerificationError("wrong ARKG signing context")
     if signing.get("user_verification_required") is not False:
         raise EvidenceVerificationError("unexpected user-verification claim")
+    # Without the review, nothing shows what the signed digests describe.
     review = evidence.get("review")
-    if review is not None:
-        if not isinstance(review, dict):
-            raise EvidenceVerificationError("release review must be an object")
-        validate_review_binding(request, review)
+    if review is None:
+        raise EvidenceVerificationError("evidence has no release review")
+    if not isinstance(review, dict):
+        raise EvidenceVerificationError("release review must be an object")
+    validate_review_binding(request, review)
 
     try:
         master = decode_cose_key(signing["master_public_key_cose_b64url"])

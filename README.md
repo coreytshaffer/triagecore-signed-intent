@@ -74,10 +74,11 @@ After the authorization expires, verify its archived cryptographic evidence:
 .\.venv\Scripts\python.exe verify_authorization.py --allow-expired
 ```
 
-Normal verification enforces the signature, canonical digest, structure, and
-expiration policy. Archival verification still enforces the signature, digest,
-and structure, but explicitly does not treat the authorization as currently
-actionable.
+Normal verification enforces the signature, canonical digest, release review,
+structure, and expiration policy. Archival verification still enforces the
+signature, digest, release review, and structure, but explicitly does not treat
+the authorization as currently actionable. Evidence without its release review
+is rejected in both modes.
 
 The signing script displays the frozen human-readable intent before requesting
 the two physical interactions used by the ARKG setup and signing ceremony.
@@ -92,9 +93,9 @@ the two physical interactions used by the ARKG setup and signing ceremony.
 - This project does not assert device attestation or a YubiKey model identity.
 - This experiment does not integrate with `tc run` or downstream execution.
 - A valid signature binds the request's stated release target. Verification
-  checks that target against the release review only when the evidence includes
-  one; evidence without a review block still verifies. A signature does not show
-  that the commit was reviewed or that anything downstream enforces it.
+  requires the release review and checks that target against it. A signature
+  does not show that the commit was reviewed or that anything downstream
+  enforces it.
 - TriageCore's separately established capability component demonstrates atomic
   one-use claiming and replay rejection. This project does not connect that
   component to previewSign or claim end-to-end execution enforcement.
