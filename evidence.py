@@ -14,7 +14,7 @@ from cryptography.exceptions import InvalidSignature
 from fido2 import cbor
 from fido2.cose import CoseKey, ESP256
 
-from authorization_request import AuthorizationRequest, AuthzError
+from authorization_request import COMMIT_ID_PATTERN, AuthorizationRequest, AuthzError
 
 EVIDENCE_SCHEMA = "triagecore.preview-sign-authorization-evidence.v1"
 SIGNING_CONTEXT = b"triagecore-signed-intent/v1"
@@ -83,6 +83,15 @@ def validate_review_binding(request: AuthorizationRequest, review: Mapping[str, 
         raise EvidenceVerificationError("release scope digest does not match request")
     if request.artifact_byte_digest != canonical_json_digest(release_ref):
         raise EvidenceVerificationError("release reference digest does not match request")
+    ref = release_ref.get("ref")
+    if not isinstance(ref, str) or not COMMIT_ID_PATTERN.fullmatch(ref):
+        raise EvidenceVerificationError("release reference is not a full commit ID")
+    repository = release_ref.get("repository")
+    if not isinstance(repository, str) or not repository:
+        raise EvidenceVerificationError("release reference names no repository")
+    # The signer is shown the intent, so the bound release reference must match it.
+    if (repository, ref) != (intent.get("repository"), intent.get("ref")):
+        raise EvidenceVerificationError("release reference does not match the displayed intent")
 
 
 def encode_cose_key(key: CoseKey) -> str:
