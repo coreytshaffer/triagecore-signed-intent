@@ -28,8 +28,11 @@ human-readable release intent
 > verified offline. Executor enforcement, execution evidence, and independent
 > validation remain separate downstream concerns.
 
-The release intent binds publication to the exact reviewed Git commit, not a
-mutable branch name.
+The signed request binds its stated release target: a repository name and one
+full Git commit ID, not a mutable branch name. Preparation checks only that the
+ID names a commit object in the local clone. That does not show that the commit
+belongs to the named GitHub repository, or that it was reviewed, pushed, or
+published.
 
 ## Quickstart
 
@@ -47,9 +50,13 @@ Freeze a release request after committing the exact release candidate:
 
 ```powershell
 .\.venv\Scripts\python.exe prepare_release_request.py `
-  --commit <exact-release-candidate-sha> `
+  --commit <full-release-candidate-commit-id> `
   --expires-at 2026-08-06T15:00:00+00:00
 ```
+
+Preparation rejects abbreviated or malformed commit IDs and IDs that do not name
+a commit object in this clone, or in the local repository given with `--repo`.
+Git replacement refs are ignored for this check.
 
 On Windows, run the signing ceremony from an Administrator PowerShell window;
 the experimental native WebAuthn path may not otherwise return previewSign
@@ -84,6 +91,10 @@ the two physical interactions used by the ARKG setup and signing ceremony.
   comprehension or informed consent.
 - This project does not assert device attestation or a YubiKey model identity.
 - This experiment does not integrate with `tc run` or downstream execution.
+- A valid signature binds the request's stated release target. Verification
+  checks that target against the release review only when the evidence includes
+  one; evidence without a review block still verifies. A signature does not show
+  that the commit was reviewed or that anything downstream enforces it.
 - TriageCore's separately established capability component demonstrates atomic
   one-use claiming and replay rejection. This project does not connect that
   component to previewSign or claim end-to-end execution enforcement.
