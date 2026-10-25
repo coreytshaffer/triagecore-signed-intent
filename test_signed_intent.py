@@ -13,6 +13,7 @@ from fido2.cose import ESP256
 from authorization_request import AuthorizationRequest, REQUEST_SCHEMA
 from evidence import (
     EvidenceVerificationError,
+    canonical_json_digest,
     load_request,
     request_digest,
     validate_review_binding,
@@ -158,3 +159,60 @@ def test_release_commit_ignores_git_replacement_refs(release_repo):
         with pytest.raises(ValueError, match="is not a commit"):
             resolve_commit(release_repo, replaced)
     assert resolve_commit(release_repo, commit) == commit
+
+
+def request_binding(review: dict) -> AuthorizationRequest:
+    """A test request whose digests bind exactly this review."""
+    return AuthorizationRequest(
+        decision_id="test-review-binding",
+        artifact_byte_digest=canonical_json_digest(review["release_ref"]),
+        plan_body_digest=canonical_json_digest(review["intent"]),
+        scope_digest=canonical_json_digest(review["scope"]),
+        task_id="f3c24d60-5360-41dc-9dc6-b7cbb91b68b8",
+        risk_class="medium",
+        policy_version="signed-intent-test-v1",
+        approver_identity_id="test-approver",
+        user_verification_required=False,
+        nonce="00000000-0000-4000-8000-000000000002",
+        issued_at="2026-08-05T12:00:00+00:00",
+        expires_at="2026-08-06T12:00:00+00:00",
+    )
+
+
+def review_for(intent_ref: str, release_ref: str) -> dict:
+    repository = "coreytshaffer/triagecore-signed-intent"
+    return {
+        "intent": {"repository": repository, "ref": intent_ref},
+        "scope": {"allowed_effects": ["publish the referenced source"]},
+        "release_ref": {"repository": repository, "ref": release_ref},
+    }
+
+
+def test_committed_release_review_still_binds():
+    request = load_request(DIRECTORY / "authorization-request.json")
+    review = json.loads((DIRECTORY / "release-review.json").read_text(encoding="utf-8"))
+    validate_review_binding(request, review)
+
+
+def test_review_binding_rejects_an_abbreviated_release_ref():
+    review = review_for("78822deda7f6", "78822deda7f6")
+    with pytest.raises(EvidenceVerificationError, match="not a full commit ID"):
+        validate_review_binding(request_binding(review), review)
+
+
+def test_review_binding_rejects_a_release_ref_that_differs_from_the_displayed_intent():
+    review = review_for("a" * 40, "b" * 40)
+    with pytest.raises(EvidenceVerificationError, match="does not match the displayed intent"):
+        validate_review_binding(request_binding(review), review)
+
+
+def test_review_binding_requires_a_named_release_repository():
+    for repository in (None, ""):
+        review = review_for("a" * 40, "a" * 40)
+        for block in ("intent", "release_ref"):
+            if repository is None:
+                del review[block]["repository"]
+            else:
+                review[block]["repository"] = repository
+        with pytest.raises(EvidenceVerificationError, match="names no repository"):
+            validate_review_binding(request_binding(review), review)

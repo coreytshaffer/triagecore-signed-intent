@@ -19,6 +19,7 @@ DEFAULT_REQUEST_TTL_SECONDS = 600
 _RISK_CLASSES = frozenset({"low", "medium", "high"})
 _IDENTIFIER_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]{1,63}$")
 _DIGEST_PATTERN = re.compile(r"^sha256:[0-9a-f]{64}$")
+COMMIT_ID_PATTERN = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 
 
 class AuthzError(ValueError):

@@ -5,15 +5,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import re
 import subprocess
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from authorization_request import AuthorizationRequest
-
-FULL_COMMIT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
+from authorization_request import COMMIT_ID_PATTERN, AuthorizationRequest
 
 
 def canonical_bytes(value: object) -> bytes:
@@ -27,7 +24,7 @@ def digest(value: object) -> str:
 def resolve_commit(repository: Path, commit: str) -> str:
     """Return the full commit ID only if it names a commit object in the local repository."""
     commit = commit.lower()
-    if not FULL_COMMIT_ID.fullmatch(commit):
+    if not COMMIT_ID_PATTERN.fullmatch(commit):
         raise ValueError("--commit must be a full 40- or 64-character Git commit ID")
     # Without --no-replace-objects, a refs/replace entry can make a missing ID
     # or a blob resolve as a commit under its own ID.
