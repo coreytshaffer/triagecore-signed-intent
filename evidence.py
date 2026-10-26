@@ -5,14 +5,15 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+from collections.abc import Mapping
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from cryptography.exceptions import InvalidSignature
 from fido2 import cbor
-from fido2.cose import CoseKey, ESP256
+from fido2.cose import ESP256, CoseKey
 
 from authorization_request import COMMIT_ID_PATTERN, AuthorizationRequest, AuthzError
 
@@ -38,6 +39,8 @@ def _b64encode(value: bytes) -> str:
 
 
 def _b64decode(value: str) -> bytes:
+    if not isinstance(value, str):
+        raise EvidenceVerificationError("base64url evidence value must be a string")
     padding = "=" * (-len(value) % 4)
     try:
         return base64.urlsafe_b64decode(value + padding)
@@ -54,7 +57,7 @@ def load_request(path: Path) -> AuthorizationRequest:
         raise EvidenceVerificationError("authorization request must be a JSON object")
     try:
         return AuthorizationRequest(**value)
-    except (AuthzError, TypeError, ValueError) as exc:
+    except (AttributeError, TypeError, ValueError) as exc:
         raise EvidenceVerificationError(f"invalid authorization request: {exc}") from exc
 
 
@@ -72,6 +75,8 @@ def canonical_json_digest(value: object) -> str:
 
 
 def validate_review_binding(request: AuthorizationRequest, review: Mapping[str, Any]) -> None:
+    if not isinstance(review, Mapping):
+        raise EvidenceVerificationError("release review must be an object")
     intent = review.get("intent")
     scope = review.get("scope")
     release_ref = review.get("release_ref")
@@ -156,6 +161,8 @@ def verify_evidence(
     now: datetime | None = None,
     enforce_expiration: bool = True,
 ) -> dict[str, str]:
+    if not isinstance(evidence, Mapping):
+        raise EvidenceVerificationError("evidence must be a JSON object")
     if evidence.get("schema") != EVIDENCE_SCHEMA:
         raise EvidenceVerificationError("unsupported evidence schema")
 
@@ -166,7 +173,7 @@ def verify_evidence(
 
     try:
         request = AuthorizationRequest(**request_value)
-    except (TypeError, ValueError) as exc:
+    except (AttributeError, TypeError, ValueError) as exc:
         raise EvidenceVerificationError(f"invalid evidence request: {exc}") from exc
 
     digest = request_digest(request)
@@ -216,6 +223,8 @@ def verify_evidence(
 
 
 def tampered_copy(evidence: Mapping[str, Any], field: str) -> dict[str, Any]:
+    if not isinstance(evidence, Mapping):
+        raise EvidenceVerificationError("evidence must be a JSON object")
     value = deepcopy(dict(evidence))
     request = value.get("request")
     if not isinstance(request, dict) or field not in request:

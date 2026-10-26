@@ -49,9 +49,10 @@ py -3.12 -m venv .venv
 Freeze a release request after committing the exact release candidate:
 
 ```powershell
+$expiresAt = [DateTimeOffset]::UtcNow.AddMinutes(10).ToString("o")
 .\.venv\Scripts\python.exe prepare_release_request.py `
   --commit <full-release-candidate-commit-id> `
-  --expires-at 2026-08-06T15:00:00+00:00
+  --expires-at $expiresAt
 ```
 
 Preparation rejects abbreviated or malformed commit IDs and IDs that do not name
@@ -80,6 +81,16 @@ signature, digest, release review, and structure, but explicitly does not treat
 the authorization as currently actionable. Evidence without its release review
 is rejected in both modes.
 
+The committed evidence is a historical sample with an expired authorization;
+use `--allow-expired` to check it. `verification-output.txt` records the original
+ceremony and checks, rather than the current test suite or CLI output. The
+flowchart's expiry check applies to normal verification.
+
+The CLI escapes control characters in the bound release target so that
+repository text cannot create extra output lines or terminal control sequences.
+Malformed evidence is rejected with a verification error, including malformed
+envelope, request-field, and signing-value types.
+
 The signing script displays the frozen human-readable intent before requesting
 the two physical interactions used by the ARKG setup and signing ceremony.
 
@@ -88,6 +99,8 @@ the two physical interactions used by the ARKG setup and signing ceremony.
 - This uses beta/preview YubiKey 5.8 interfaces and is not for production
   credentials.
 - The evidence contains public verification material, not a private key or PIN.
+- Verification keys are supplied in the evidence. Offline verification does not
+  independently establish that a key belongs to the claimed approver.
 - A hardware interaction shows credential use; it does not establish human
   comprehension or informed consent.
 - This project does not assert device attestation or a YubiKey model identity.
