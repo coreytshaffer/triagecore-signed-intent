@@ -13,10 +13,12 @@ from fido2.cose import ESP256
 from authorization_request import AuthorizationRequest, REQUEST_SCHEMA
 from evidence import (
     EvidenceVerificationError,
+    build_evidence,
     canonical_json_digest,
     load_request,
     request_digest,
     validate_review_binding,
+    verify_evidence,
     verify_signature,
 )
 from prepare_release_request import main as prepare_release_request, resolve_commit
@@ -216,3 +218,64 @@ def test_review_binding_requires_a_named_release_repository():
                 review[block]["repository"] = repository
         with pytest.raises(EvidenceVerificationError, match="names no repository"):
             validate_review_binding(request_binding(review), review)
+
+
+def load_sample_evidence() -> dict:
+    return json.loads((DIRECTORY / "authorization-evidence.json").read_text(encoding="utf-8"))
+
+
+def test_committed_evidence_verifies_with_its_release_review():
+    assert verify_evidence(load_sample_evidence(), enforce_expiration=False)["status"] == "verified"
+
+
+def test_evidence_without_a_release_review_is_rejected():
+    """The signature alone does not show what the signed digests meant."""
+    evidence = load_sample_evidence()
+    del evidence["review"]
+    with pytest.raises(EvidenceVerificationError, match="no release review"):
+        verify_evidence(evidence, enforce_expiration=False)
+
+
+def test_evidence_with_a_non_object_release_review_is_rejected():
+    evidence = load_sample_evidence()
+    evidence["review"] = []
+    with pytest.raises(EvidenceVerificationError, match="must be an object"):
+        verify_evidence(evidence, enforce_expiration=False)
+
+
+def test_evidence_with_an_altered_release_review_is_rejected():
+    evidence = load_sample_evidence()
+    evidence["review"]["intent"]["purpose"] += " (altered)"
+    with pytest.raises(EvidenceVerificationError, match="intent digest"):
+        verify_evidence(evidence, enforce_expiration=False)
+
+
+def test_building_evidence_requires_a_release_review():
+    key = ESP256.from_cryptography_key(ec.generate_private_key(ec.SECP256R1()).public_key())
+    with pytest.raises(TypeError):
+        build_evidence(
+            build_test_request(),
+            master_public_key=key,
+            derived_public_key=key,
+            ikm=bytes(32),
+            signature=b"",
+        )
+
+
+SAMPLE_RELEASE_TARGET = "coreytshaffer/triagecore-signed-intent@78822deda7f65595cbe56b552e9ae20965a3c122"
+
+
+def test_verification_reports_the_bound_release_target():
+    summary = verify_evidence(load_sample_evidence(), enforce_expiration=False)
+    assert summary["release_target"] == SAMPLE_RELEASE_TARGET
+
+
+def test_verifier_prints_the_bound_release_target():
+    result = subprocess.run(
+        [sys.executable, str(DIRECTORY / "verify_authorization.py"), "--allow-expired"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout
+    assert f"[OK] Release target bound: {SAMPLE_RELEASE_TARGET}" in result.stdout

@@ -72,6 +72,8 @@ def main() -> int:
         return 1
     print("[OK] Offline signature verified")
     print(f"[OK] Request digest matched: {summary['request_digest']}")
+    release_target = json.dumps(summary["release_target"], ensure_ascii=True)[1:-1]
+    print(f"[OK] Release target bound: {release_target}")
     if args.allow_expired:
         print("[WARN] Expiration policy was not enforced (archival verification mode)")
     else:

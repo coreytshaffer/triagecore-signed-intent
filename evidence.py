@@ -5,14 +5,15 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
+from collections.abc import Mapping
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from cryptography.exceptions import InvalidSignature
 from fido2 import cbor
-from fido2.cose import CoseKey, ESP256
+from fido2.cose import ESP256, CoseKey
 
 from authorization_request import COMMIT_ID_PATTERN, AuthorizationRequest, AuthzError
 
@@ -38,6 +39,8 @@ def _b64encode(value: bytes) -> str:
 
 
 def _b64decode(value: str) -> bytes:
+    if not isinstance(value, str):
+        raise EvidenceVerificationError("base64url evidence value must be a string")
     padding = "=" * (-len(value) % 4)
     try:
         return base64.urlsafe_b64decode(value + padding)
@@ -54,7 +57,7 @@ def load_request(path: Path) -> AuthorizationRequest:
         raise EvidenceVerificationError("authorization request must be a JSON object")
     try:
         return AuthorizationRequest(**value)
-    except (AuthzError, TypeError, ValueError) as exc:
+    except (AttributeError, TypeError, ValueError) as exc:
         raise EvidenceVerificationError(f"invalid authorization request: {exc}") from exc
 
 
@@ -72,6 +75,8 @@ def canonical_json_digest(value: object) -> str:
 
 
 def validate_review_binding(request: AuthorizationRequest, review: Mapping[str, Any]) -> None:
+    if not isinstance(review, Mapping):
+        raise EvidenceVerificationError("release review must be an object")
     intent = review.get("intent")
     scope = review.get("scope")
     release_ref = review.get("release_ref")
@@ -126,7 +131,7 @@ def build_evidence(
     derived_public_key: CoseKey,
     ikm: bytes,
     signature: bytes,
-    review: Mapping[str, Any] | None = None,
+    review: Mapping[str, Any],
 ) -> dict[str, Any]:
     evidence = {
         "schema": EVIDENCE_SCHEMA,
@@ -145,9 +150,8 @@ def build_evidence(
         },
         "limitations": list(LIMITATIONS),
     }
-    if review is not None:
-        validate_review_binding(request, review)
-        evidence["review"] = dict(review)
+    validate_review_binding(request, review)
+    evidence["review"] = dict(review)
     return evidence
 
 
@@ -157,6 +161,8 @@ def verify_evidence(
     now: datetime | None = None,
     enforce_expiration: bool = True,
 ) -> dict[str, str]:
+    if not isinstance(evidence, Mapping):
+        raise EvidenceVerificationError("evidence must be a JSON object")
     if evidence.get("schema") != EVIDENCE_SCHEMA:
         raise EvidenceVerificationError("unsupported evidence schema")
 
@@ -167,7 +173,7 @@ def verify_evidence(
 
     try:
         request = AuthorizationRequest(**request_value)
-    except (TypeError, ValueError) as exc:
+    except (AttributeError, TypeError, ValueError) as exc:
         raise EvidenceVerificationError(f"invalid evidence request: {exc}") from exc
 
     digest = request_digest(request)
@@ -181,11 +187,13 @@ def verify_evidence(
         raise EvidenceVerificationError("wrong ARKG signing context")
     if signing.get("user_verification_required") is not False:
         raise EvidenceVerificationError("unexpected user-verification claim")
+    # Without the review, nothing shows what the signed digests describe.
     review = evidence.get("review")
-    if review is not None:
-        if not isinstance(review, dict):
-            raise EvidenceVerificationError("release review must be an object")
-        validate_review_binding(request, review)
+    if review is None:
+        raise EvidenceVerificationError("evidence has no release review")
+    if not isinstance(review, dict):
+        raise EvidenceVerificationError("release review must be an object")
+    validate_review_binding(request, review)
 
     try:
         master = decode_cose_key(signing["master_public_key_cose_b64url"])
@@ -205,14 +213,18 @@ def verify_evidence(
         raise EvidenceVerificationError("derived key does not match ARKG context and IKM")
 
     verify_signature(request.canonical_bytes(), derived, signature)
+    release_ref = review["release_ref"]
     return {
         "request_digest": digest,
         "expires_at": request.expires_at,
+        "release_target": f"{release_ref['repository']}@{release_ref['ref']}",
         "status": "verified",
     }
 
 
 def tampered_copy(evidence: Mapping[str, Any], field: str) -> dict[str, Any]:
+    if not isinstance(evidence, Mapping):
+        raise EvidenceVerificationError("evidence must be a JSON object")
     value = deepcopy(dict(evidence))
     request = value.get("request")
     if not isinstance(request, dict) or field not in request:
